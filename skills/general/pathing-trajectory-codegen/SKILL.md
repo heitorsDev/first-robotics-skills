@@ -43,7 +43,7 @@ Don't assume one. Check dependency manifests and deploy-file conventions:
 grep -ril "pathplanner\|choreo\|roadrunner" \
   build.gradle build.gradle.kts pom.xml requirements.txt pyproject.toml vendordeps 2>/dev/null
 find . -type d \( -iname "pathplanner" -o -iname "choreo" \) 2>/dev/null
-find . -iname "*.path" -o -iname "*.traj" 2>/dev/null
+find . -iname "*.path" -o -iname "*.traj" -o -iname "*.chor" 2>/dev/null
 ```
 
 Match what's found to a library:
@@ -70,7 +70,7 @@ Capture exactly what's being asked, without inferring the rest:
 - Constraints explicitly given (max velocity, max acceleration, rotation targets, hold points).
 
 Don't invent waypoints, constraints, or rotation targets the user didn't state — flag gaps in
-Step 4 instead of filling them in with a guess.
+Step 5 instead of filling them in with a guess.
 
 ---
 
@@ -84,7 +84,7 @@ In the detected library's exact schema:
   matching the repo's existing builder-call style and units (inches vs. meters — check existing
   calls, don't assume).
 - **Custom**: match the existing custom format's structure precisely; if this is the repo's
-  first path and no format exists, say so in the report (Step 4) instead of inventing one.
+  first path and no format exists, say so in the report (Step 5) instead of inventing one.
 
 Add the minimal code hook needed to load/reference the new artifact (e.g. registering a
 `PathPlannerAuto`, adding a trajectory-sequence method call) in the same place and style the
@@ -94,7 +94,22 @@ Leave constraints not explicitly stated at the library's own defaults, and say s
 
 ---
 
-## Step 4 — Report
+## Step 4 — Commit
+
+If Step 3 wrote or edited anything, stage and commit it before reporting — a push command for
+uncommitted work is useless:
+
+```bash
+git add -- <files touched in Step 3>
+git commit -m "feat(<path-or-trajectory-name>): add/tune path"
+```
+
+If nothing was written (no library could be determined and the user hasn't answered yet), skip
+this step.
+
+---
+
+## Step 5 — Report
 
 Short, structured:
 
