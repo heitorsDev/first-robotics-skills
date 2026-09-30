@@ -1,0 +1,48 @@
+name: New skill specification
+description: A skill ready to be scaffolded and implemented — scope and name are fixed.
+labels: ["new skill"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Turning a "skill idea" issue into one of these means the scope and name are
+        settled. This issue is what `create-skill` reads to scaffold the PR.
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - general
+        - frc
+        - ftc
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Skill name
+      description: >
+        Lower-kebab-case. frc/ftc scope must be prefixed (frc-..., ftc-...);
+        general is bare.
+      placeholder: frc-pathing-codegen
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: One-line description
+      description: What a marketplace listing shows before install.
+    validations:
+      required: true
+  - type: textarea
+    id: spec
+    attributes:
+      label: What the skill should do
+      description: Steps, inputs/outputs, edge cases — whatever the implementer needs.
+    validations:
+      required: true
+  - type: input
+    id: source-idea
+    attributes:
+      label: Originating "skill idea" issue (if any)
+      placeholder: "#12"

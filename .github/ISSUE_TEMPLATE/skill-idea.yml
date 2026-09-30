@@ -1,0 +1,23 @@
+name: Skill idea
+description: A raw idea for a skill, not yet fleshed out into a spec.
+labels: ["skill idea"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What should this skill do?
+      description: Freeform — a sentence or a paragraph is fine.
+    validations:
+      required: true
+  - type: dropdown
+    id: scope-guess
+    attributes:
+      label: Scope guess
+      description: Best guess only — triage may change this.
+      options:
+        - "general (works for both FTC and FRC)"
+        - "frc-only"
+        - "ftc-only"
+        - "not sure"
+    validations:
+      required: true
