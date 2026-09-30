@@ -1,0 +1,88 @@
+name: release
+
+on:
+  pull_request:
+    types:
+      - closed
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: >-
+      github.event.pull_request.merged == true
+      && github.event.pull_request.base.ref == 'main'
+      && (
+        startsWith(github.event.pull_request.head.ref, 'fix/')
+        || startsWith(github.event.pull_request.head.ref, 'feat/')
+        || startsWith(github.event.pull_request.head.ref, 'release/')
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: resolve bump type
+        id: bump
+        env:
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          echo "type=$(bash scripts/ci/bump-type-from-branch.sh "$HEAD_BRANCH")" >> "$GITHUB_OUTPUT"
+
+      - name: find changed skill
+        id: skill
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          set -euo pipefail
+          skill_dir="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" \
+            | grep -oE '^skills/(general|frc|ftc)/[^/]+' \
+            | sort -u \
+            | head -n1)"
+          if [ -z "$skill_dir" ]; then
+            echo "no skill folder changed in this PR — nothing to release"
+            echo "name=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "name=$(basename "$skill_dir")" >> "$GITHUB_OUTPUT"
+
+      - name: bump, tag and regenerate
+        if: steps.skill.outputs.name != ''
+        id: release
+        env:
+          SKILL_NAME: ${{ steps.skill.outputs.name }}
+          BUMP_TYPE: ${{ steps.bump.outputs.type }}
+        run: |
+          set -euo pipefail
+          current="$(git tag -l "${SKILL_NAME}@*" --sort=-v:refname | head -n1 | sed "s/^${SKILL_NAME}@//")"
+          [ -n "$current" ] || current="0.0.0"
+          next="$(bash scripts/ci/bump-version.sh "$current" "$BUMP_TYPE")"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git tag "${SKILL_NAME}@${next}"
+          bash scripts/ci/generate-marketplaces.sh
+
+          git add skills
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(release): ${SKILL_NAME}@${next} [skip ci]"
+            git push origin HEAD:main
+          fi
+          git push origin "${SKILL_NAME}@${next}"
+
+          echo "tag=${SKILL_NAME}@${next}" >> "$GITHUB_OUTPUT"
+
+      - name: create GitHub release
+        if: steps.skill.outputs.name != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: gh release create "$TAG" --generate-notes --title "$TAG"
