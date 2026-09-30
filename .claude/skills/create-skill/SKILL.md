@@ -66,8 +66,12 @@ Trigger: asked to implement/scaffold a skill, or pointed at an issue labeled `ne
    ```
 4. Scaffold: `./scripts/new-skill.sh <scope> <name>`.
 5. Write `skills/<scope>/<name>/SKILL.md` from the issue's `description` and `spec` fields — this
-   is real authoring, not filling a mad-lib. Delete the template's HTML comment block. Add
-   `scripts/`/`references/` only if the spec actually needs them.
+   is real authoring, not filling a mad-lib. Delete the template's HTML comment block, **except**
+   keep and adapt the "Running unattended" section's wording for this specific skill — a team can
+   run any of these skills from an unattended CI agent (see `docs-update`, `frc-code-review`,
+   `pr-code-review`, `ftc-code-reviewer` for worked examples of what that section says for a
+   push-capable skill vs. a review-output skill vs. a pure authoring skill). Add `scripts/`/
+   `references/` only if the spec actually needs them.
 6. Validate locally before committing: `bash scripts/ci/validate-skills.sh` — fix anything it
    flags now, CI will just re-find it otherwise.
 7. Commit and push:

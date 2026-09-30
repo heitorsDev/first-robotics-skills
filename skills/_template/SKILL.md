@@ -22,3 +22,27 @@ license: MIT
 ## Step 1 — ...
 
 ## Step 2 — ...
+
+## Running unattended
+
+<!--
+  Keep this section (adapt the wording, don't delete it) if this skill could plausibly
+  be invoked by an autonomous agent in a CONSUMER repo's own CI pipeline — not this
+  marketplace's CI, theirs. A team can wire any of these skills into an unattended
+  agent the same way OffSeason_2026 wires frc-code-review and docs-update into
+  opencode's GitHub Action. Two things follow from "nobody is there to answer":
+
+  - Never stall waiting for a human to resolve an ambiguity. Make the most reasonable
+    call, and say what you decided and why in your output (report, commit message,
+    PR body) so a human can correct it later instead of you blocking on it now.
+  - Any action with an effect outside this skill's ordinary scope — pushing to a
+    remote, posting a comment, opening a PR/issue, approving something — stays
+    exactly what this skill's own default flow already does, no more. If the
+    skill's default is "never push, a human pushes," that default holds in CI too
+    unless the calling system prompt explicitly grants a different behavior for
+    that environment. Don't invent CI-platform-specific mechanics (a particular
+    Actions syntax, a specific bot account) inside the skill itself — that's the
+    calling system prompt's job to specify; this skill only needs to say clearly
+    where such a point exists and what its own default is absent other instruction.
+-->
+
