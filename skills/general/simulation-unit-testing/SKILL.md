@@ -120,7 +120,21 @@ cases. Leave untouched any code path outside the target subsystem.
 
 ---
 
-## Step 5 — Flag gaps and report
+## Step 5 — Commit
+
+If Step 3 or Step 4 added or edited anything, stage and commit it before reporting — a push
+command for uncommitted work is useless:
+
+```bash
+git add -- <files touched in Step 3/4>
+git commit -m "test(<subsystem-name>): add sim-backed unit tests"
+```
+
+If nothing was written (no sim seam reachable, nothing to scaffold), skip this step.
+
+---
+
+## Step 6 — Flag gaps and report
 
 Flag anything left untestable, concretely:
 
