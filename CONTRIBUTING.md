@@ -17,6 +17,17 @@ That's the canonical, hand-edited content. `.claude-plugin/plugin.json` and the 
 
 ## Starting a new skill
 
+Have an idea but no spec yet? Open a [**skill idea**](../../issues/new?template=skill-idea.yml)
+issue. Have a settled scope/name/spec? Open a
+[**new skill**](../../issues/new?template=new-skill.yml) issue directly.
+
+If you're working with Claude Code inside this repo, the `create-skill` skill
+(`.claude/skills/create-skill/`) drives both moves end to end — triaging a `skill idea` issue into
+a `new skill` issue, and turning a `new skill` issue into a scaffolded branch + PR. Point it at an
+issue number and it handles branch naming, scaffolding, and opening the PR.
+
+To scaffold by hand instead:
+
 ```
 ./scripts/new-skill.sh <general|frc|ftc> <skill-name>
 ```
