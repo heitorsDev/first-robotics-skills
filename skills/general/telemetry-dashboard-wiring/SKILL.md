@@ -48,22 +48,22 @@ Don't assume one. Search for known tooling by import and call pattern:
 
 ```bash
 # Shuffleboard (WPILib)
-grep -rl "edu.wpi.first.wpilibj.shuffleboard\|Shuffleboard.getTab" --include=*.java .
+grep -rl "edu.wpi.first.wpilibj.shuffleboard\|Shuffleboard.getTab" --include='*.java' .
 
 # SmartDashboard (WPILib)
 grep -rl "edu.wpi.first.wpilibj.smartdashboard.SmartDashboard\|SmartDashboard\.put" \
-  --include=*.java .
+  --include='*.java' .
 
 # AdvantageKit / AdvantageScope
 grep -rl "org.littletonrobotics.junction\|Logger\.recordOutput\|Logger\.processInputs" \
-  --include=*.java .
+  --include='*.java' .
 
 # FTC Dashboard
 grep -rl "com.acmerobotics.dashboard\|FtcDashboard.getInstance\|@Config" \
-  --include=*.java .
+  --include='*.java' .
 
 # Raw NetworkTables (no wrapper library)
-grep -rl "NetworkTableInstance" --include=*.java .
+grep -rl "NetworkTableInstance" --include='*.java' .
 ```
 
 Match what's found to a tool and record the **exact existing convention**: Shuffleboard tab
@@ -133,7 +133,21 @@ Gate every flag with the concrete-scenario test: can you name the exact value an
 
 ---
 
-## Step 5 — Report
+## Step 5 — Commit
+
+If Step 3 added or standardized anything, stage and commit it before reporting — a push command
+for uncommitted work is useless:
+
+```bash
+git add -- <files touched in Step 3>
+git commit -m "feat(<subsystem-or-value-name>): wire up telemetry binding"
+```
+
+If Step 3 made no edits, skip this step.
+
+---
+
+## Step 6 — Report
 
 Short, structured:
 
