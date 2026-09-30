@@ -1,0 +1,18 @@
+# Command-based debugging: symptom → likely cause
+
+A quick-reference table for the most common command-based bugs. None of these throw a compile
+error or a stack trace — they show up as "the robot doesn't do what I told it to," which is what
+makes them worth checking in order before assuming the bug is somewhere more exotic.
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| Two commands touching the same mechanism both seem to run, and the mechanism fights itself or twitches | Missing `addRequirements(subsystem)` in one (or both) commands' constructors | Add `addRequirements(...)` for every subsystem the command reads from *or* writes to |
+| A mechanism keeps moving / holding an old output after its command ends, with nothing scheduled | No default command set for that subsystem via `setDefaultCommand(...)` | Give every actuated subsystem a default command — even a "hold current position" or "stop" command, not just drivetrain teleop |
+| A command that's supposed to run forever (teleop drive, a held PID loop) gets interrupted or ends on its own | `isFinished()` omitted or returning `true` unintentionally (e.g. an uninitialized boolean, or a tolerance check that's trivially satisfied at the resting setpoint) | Explicitly `return false` for "runs until interrupted" commands; audit any tolerance-based `isFinished()` against the actual resting state |
+| A `Command` subclass behaves correctly the first time it runs but drifts, overshoots, or snaps on the second run | PID/`ProfiledPIDController` state (integrator, previous error, motion profile) not reset in `initialize()` | Call `.reset(...)` on every stateful controller in `initialize()`, using the *current* measured state, not a hardcoded value |
+| Driver station shows a loop-time overrun, or robot code prints a scheduler watchdog warning | A blocking call (`Thread.sleep`, network I/O), unbounded loop, or heavy allocation inside a command's `execute()` or a subsystem's `periodic()` | Move one-time setup to the constructor/`initialize()`; never block inside a 20 ms cycle; profile which subsystem/command is expensive rather than tolerating the overrun |
+| Telemetry updates but the mechanism doesn't respond to a new setpoint | Setpoint mutated on a field the running command doesn't re-read (e.g. `execute()` captured the value once instead of reading it each cycle) | Read live state (`getTarget()`, a `Supplier<Double>`) inside `execute()`, not a value captured at construction or `initialize()` time |
+| A value drifts out of sync between two files (e.g. a CAN ID or gear ratio used in two places) | The value was hardcoded inline instead of referenced from `Constants.java` | Pull the value into `Constants.java` (or the repo's existing constants convention) and reference it from both call sites |
+| `getAutonomousCommand()` always runs the same auto regardless of dashboard selection | No `SendableChooser` wired up — the method just returns a fixed command | Wire a `SendableChooser<Command>` and publish it to the dashboard, or flag the limitation instead of silently picking a different fixed auto |
+| A vendor library's runtime config (swerve modules, paths) doesn't take effect after a deploy | Config file placed outside `src/main/deploy/`, so it wasn't copied to the roboRIO | Confirm the vendor library reads from `src/main/deploy/...` and that the file actually deployed (check the RIO's `/home/lvuser/deploy`) |
+| Enabling `wpi.java.debugJni` "to see more logs" tanks loop performance | JNI debug mode is a genuine, heavy performance cost, not a free logging toggle | Leave `debugJni = false`; get debug info from `SmartDashboard`/logging instead |
