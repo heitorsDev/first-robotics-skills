@@ -98,7 +98,21 @@ where it is? If not, it's not a finding.
 
 ---
 
-## Step 5 — Report
+## Step 5 — Commit
+
+If Step 3 wired/edited anything, stage and commit it before reporting — a push command for
+uncommitted work is useless:
+
+```bash
+git add -- <files touched in Step 3>
+git commit -m "feat(<device-name>): wire up <vendor> config"
+```
+
+If Step 3 made no edits (nothing recognized, or every device already matched), skip this step.
+
+---
+
+## Step 6 — Report
 
 Short, structured:
 
