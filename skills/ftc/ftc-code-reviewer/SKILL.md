@@ -271,15 +271,30 @@ robot — a workflow PR asks "the Action ran green on this PR", not "tested on t
 
 ---
 
-## Usage in CI
+## Running unattended
 
-When running inside a CI agent, the final report **is** the Pull Request comment. So:
+A team can wire this skill into an autonomous CI agent that runs on every PR — this skill's job
+stops at producing the report; deciding how that report reaches anyone is not this skill's job.
+Keep those two concerns separate:
 
-- The last message must be the report only — no "ok, done", no narrating the steps.
-- Stay under ~60,000 characters (GitHub's comment limit). The 12-finding cap usually keeps you
-  well under it.
-- Don't use `bash` to commit, push, or approve the PR. This skill **only reviews and comments**.
-- If you lack permission to read the diff, say which command failed and what needs to be granted.
+- **Your final message is the report, and only the report.** No "ok, done", no narrating the
+  steps. Whatever wraps this skill captures that final message as-is and delivers it somewhere —
+  an issue-style PR comment, a formal GitHub PR review (`gh pr review`, distinct from a plain
+  comment — a real review with an APPROVE/COMMENT/REQUEST_CHANGES verdict, not just another line in
+  the conversation), anything else. Which one is the calling system prompt's decision, not this
+  skill's — don't assume a specific delivery mechanism, and don't hardcode one platform's posting
+  command into your own steps.
+- If the delivery mechanism is a formal PR review and the calling system prompt asks you to map
+  this report's verdict onto it, the natural mapping is: ✅ Approved → approve, ⚠️ Approved with
+  caveats → comment, ❌ Needs changes before merge → request changes. Offer that mapping when
+  asked — it's not something to act on unprompted; submitting the review is the wrapping system's
+  call, this skill produces the content it would contain.
+- Stay under whatever size limit the delivery mechanism imposes (~60,000 characters for a single
+  GitHub comment or review body). The 12-finding cap usually keeps you well under it.
+- Don't use `bash` to commit, push, approve, or comment yourself. This skill **only reviews** —
+  producing the report is the whole job, however it's decided to get delivered.
+- If you lack permission to read the diff, say which command failed and what needs to be granted,
+  rather than stalling.
 - On `synchronize` (a new push to an already-reviewed PR), the Step 1.5 history is what keeps you
   from writing the same review twice. Read it first, always.
 - The workflow needs `pull-requests: read` (already covered by `pull-requests: write`) and
