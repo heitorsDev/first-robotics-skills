@@ -271,7 +271,7 @@ robot — a workflow PR asks "did the Action run green on this PR," not `simulat
 
 ---
 
-## Using this in CI
+## Running unattended
 
 When running inside an automated CI agent, the final report **is** the Pull Request comment.
 So:
