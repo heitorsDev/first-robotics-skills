@@ -5,9 +5,24 @@
   },
   "plugins": [
     {
+      "name": "docs-update",
+      "source": "../../general/docs-update",
+      "description": "Keeps a documentation-only branch in sync with the code branch and rewrites the docs/ folder from the changes that came in. Merges the source branch (master/main) into the docs branch, diffs it against the last documented commit, routes each changed file to a section page, and regenerates the index files. Use when asked to \"update the docs\", \"sync the docs branch\", \"document what changed\", \"atualizar a documentação\", or when /docs-update is invoked."
+    },
+    {
+      "name": "pr-code-review",
+      "source": "../../general/pr-code-review",
+      "description": "Reviews a pull request diff across clean-code, architecture (constants vs. magic numbers, coupling, layering), and CI/infra (workflows, build scripts, deploy configs) axes, and produces a severity-tagged report (🔴🟠🟡🟢) suitable for posting as an automated PR comment. Use when asked to \"review this PR\", \"code review\", \"review the diff\", or when a CI agent needs to comment on a pull request."
+    },
+    {
       "name": "ftc-code-authoring",
       "source": "../../ftc/ftc-code-authoring",
       "description": "Write and debug FTC SDK code — OpMode lifecycle (init/loop/stop), hardware-map device access, LinearOpMode vs. iterative OpMode, TeleOp and Autonomous structure, and the hardware-map pitfalls that cause the most FTC runtime crashes. Use when authoring a new OpMode, converting between OpMode styles, or debugging a \"Config mismatch\" / ClassCastException / NullPointerException thrown by the Robot Controller app."
+    },
+    {
+      "name": "ftc-code-reviewer",
+      "source": "../../ftc/ftc-code-reviewer",
+      "description": "Reviews a PR diff for an FTC (FIRST Tech Challenge) robot codebase across clean-code, FTC-specific hardware-safety standards (OpMode lifecycle, hardware-map usage, motor/servo power limits, telemetry), architecture, and CI/infra axes; produces a severity-tagged report ready to post as an automated PR comment. Use when asked to \"review this PR\", \"code review\", \"review diff\", or when a CI agent needs to comment on a Pull Request in an FTC codebase."
     }
   ]
 }

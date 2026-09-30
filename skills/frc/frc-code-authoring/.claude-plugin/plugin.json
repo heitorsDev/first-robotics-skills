@@ -1,0 +1,8 @@
+{
+  "name": "frc-code-authoring",
+  "description": "Authors and debugs FRC robot code against WPILib's command-based programming model (Subsystem/Command, CommandScheduler, requirements, default commands) and roboRIO/GradleRIO deployment conventions (vendordeps, deploy artifacts, the 20 ms loop budget). Use when writing a new subsystem or command, wiring RobotContainer, debugging a command that won't run or a scheduler conflict, or setting up a deploy/vendor library.",
+  "version": "0.1.0",
+  "author": {
+    "name": "FIRST Robotics Skills contributors"
+  }
+}

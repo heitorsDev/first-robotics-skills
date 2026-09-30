@@ -5,6 +5,21 @@
   },
   "plugins": [
     {
+      "name": "docs-update",
+      "source": "../../general/docs-update",
+      "description": "Keeps a documentation-only branch in sync with the code branch and rewrites the docs/ folder from the changes that came in. Merges the source branch (master/main) into the docs branch, diffs it against the last documented commit, routes each changed file to a section page, and regenerates the index files. Use when asked to \"update the docs\", \"sync the docs branch\", \"document what changed\", \"atualizar a documentação\", or when /docs-update is invoked."
+    },
+    {
+      "name": "pr-code-review",
+      "source": "../../general/pr-code-review",
+      "description": "Reviews a pull request diff across clean-code, architecture (constants vs. magic numbers, coupling, layering), and CI/infra (workflows, build scripts, deploy configs) axes, and produces a severity-tagged report (🔴🟠🟡🟢) suitable for posting as an automated PR comment. Use when asked to \"review this PR\", \"code review\", \"review the diff\", or when a CI agent needs to comment on a pull request."
+    },
+    {
+      "name": "frc-code-authoring",
+      "source": "../../frc/frc-code-authoring",
+      "description": "Authors and debugs FRC robot code against WPILib's command-based programming model (Subsystem/Command, CommandScheduler, requirements, default commands) and roboRIO/GradleRIO deployment conventions (vendordeps, deploy artifacts, the 20 ms loop budget). Use when writing a new subsystem or command, wiring RobotContainer, debugging a command that won't run or a scheduler conflict, or setting up a deploy/vendor library."
+    },
+    {
       "name": "frc-code-review",
       "source": "../../frc/frc-code-review",
       "description": "Reviews an FRC robot-code Pull Request diff across the axes the diff actually calls for — Java/clean code, FRC/WPILib hardware-safety standards (command-based patterns, current limits, the 20 ms loop, CAN IDs, swerve/path deploy config), clean architecture, and infra/scripts. Produces a severity-tagged Markdown report ready to post as a PR comment. Use when asked to \"review this PR\", \"code review\", \"review the diff\", or when a CI agent needs to comment on a Pull Request in an FRC robot codebase."

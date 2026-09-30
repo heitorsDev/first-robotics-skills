@@ -1,0 +1,8 @@
+{
+  "name": "ftc-code-reviewer",
+  "description": "Reviews a PR diff for an FTC (FIRST Tech Challenge) robot codebase across clean-code, FTC-specific hardware-safety standards (OpMode lifecycle, hardware-map usage, motor/servo power limits, telemetry), architecture, and CI/infra axes; produces a severity-tagged report ready to post as an automated PR comment. Use when asked to \"review this PR\", \"code review\", \"review diff\", or when a CI agent needs to comment on a Pull Request in an FTC codebase.",
+  "version": "0.1.0",
+  "author": {
+    "name": "FIRST Robotics Skills contributors"
+  }
+}

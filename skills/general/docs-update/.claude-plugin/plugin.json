@@ -1,0 +1,8 @@
+{
+  "name": "docs-update",
+  "description": "Keeps a documentation-only branch in sync with the code branch and rewrites the docs/ folder from the changes that came in. Merges the source branch (master/main) into the docs branch, diffs it against the last documented commit, routes each changed file to a section page, and regenerates the index files. Use when asked to \"update the docs\", \"sync the docs branch\", \"document what changed\", \"atualizar a documentação\", or when /docs-update is invoked.",
+  "version": "0.1.0",
+  "author": {
+    "name": "FIRST Robotics Skills contributors"
+  }
+}
