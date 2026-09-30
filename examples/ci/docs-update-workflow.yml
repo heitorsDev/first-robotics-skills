@@ -1,0 +1,48 @@
+# Example: run the `docs-update` skill on every push to main, then open the PR back
+# to the source branch the skill's own "never push" default expects a separate step to do.
+#
+# See ./README.md for the pattern this implements. Adapt the "Run docs-update" step to
+# whatever agent CLI/harness your team runs — this example assumes Claude Code's CLI is
+# available in the runner image.
+
+name: docs-update
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install the agent CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run docs-update
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          claude -p "/docs-update" --permission-mode acceptEdits
+          # The skill commits on the docs branch itself and stops there — it never pushes.
+
+      - name: Open the docs PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SHA="$(git rev-parse HEAD)"
+          BRANCH="docs-sync/${SHA::12}"
+          git checkout docs
+          git push origin "docs:${BRANCH}"
+          gh pr create \
+            --base main \
+            --head "${BRANCH}" \
+            --title "docs: sync docs branch through ${SHA::12}" \
+            --body "Automated docs-update run for commit ${SHA}. Review the generated pages before merging."

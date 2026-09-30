@@ -61,6 +61,8 @@ optional just because nobody's there to run the printed command.
   there's nobody to answer a question. Make the most conservative call available (usually: stop,
   commit nothing, explain why in your final output) and say so plainly, so a human reviews it after
   the fact instead of you blocking mid-run waiting for an answer that won't come.
+- See `examples/ci/README.md` (repo root) for a concrete, copy-pasteable GitHub Actions workflow
+  implementing this exact pattern.
 
 ## Step 0 — Preconditions
 

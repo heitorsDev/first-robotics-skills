@@ -271,7 +271,7 @@ robot — a workflow PR asks "did the Action run green on this PR," not `simulat
 
 ---
 
-## Using this in CI
+## Running unattended
 
 When running inside an automated CI agent, the final report **is** the Pull Request comment.
 So:
@@ -287,3 +287,5 @@ So:
   from rewriting the same review from scratch. Always read it first.
 - The workflow needs `pull-requests: read` (already covered by `pull-requests: write`) and
   `$GH_TOKEN` in the environment for `get-pr-history.sh` to work.
+- See `examples/ci/README.md` (repo root) for a concrete, copy-pasteable GitHub Actions workflow
+  that posts this skill's report as an actual PR review (`gh pr review`), not a plain comment.
