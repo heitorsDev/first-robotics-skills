@@ -38,20 +38,28 @@ jobs:
       - name: find changed skill
         id: skill
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
         run: |
           set -euo pipefail
-          skill_dir="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" \
+          # github.event.pull_request.base.sha is not reliable here: when two PRs
+          # merge close together, GitHub can report a base.sha from before the
+          # other one landed, making this diff span both merges. The merge
+          # commit's own first parent is exact regardless of what else merged
+          # around the same time — it's always "main right before this merge."
+          base_sha="$(git rev-parse "${MERGE_SHA}^1")"
+          skill_dirs="$(git diff --name-only "$base_sha" "$MERGE_SHA" \
             | grep -oE '^skills/(general|frc|ftc)/[^/]+' \
-            | sort -u \
-            | head -n1)"
-          if [ -z "$skill_dir" ]; then
+            | sort -u)"
+          if [ -z "$skill_dirs" ]; then
             echo "no skill folder changed in this PR — nothing to release"
             echo "name=" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          echo "name=$(basename "$skill_dir")" >> "$GITHUB_OUTPUT"
+          if [ "$(echo "$skill_dirs" | wc -l)" -gt 1 ]; then
+            echo "::error::more than one skill folder changed in this merge — refusing to guess which to release: $(echo "$skill_dirs" | tr '\n' ' ')"
+            exit 1
+          fi
+          echo "name=$(basename "$skill_dirs")" >> "$GITHUB_OUTPUT"
 
       - name: bump, tag and regenerate
         if: steps.skill.outputs.name != ''
