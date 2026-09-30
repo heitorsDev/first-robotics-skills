@@ -66,6 +66,7 @@ write_marketplace() {
   local plugins_json="[]"
   local entry scope_ name dir desc source
   for entry in "$@"; do
+    [ -n "$entry" ] || continue
     IFS='|' read -r scope_ name dir desc <<< "$entry"
     source="../../${dir#skills/}"
     plugins_json="$(echo "$plugins_json" | jq \
@@ -82,6 +83,6 @@ write_marketplace() {
   echo "wrote $out ($(echo "$plugins_json" | jq length) plugins)"
 }
 
-write_marketplace general "${general_entries[@]:-}"
-write_marketplace frc "${general_entries[@]:-}" "${frc_entries[@]:-}"
-write_marketplace ftc "${general_entries[@]:-}" "${ftc_entries[@]:-}"
+write_marketplace general "${general_entries[@]}"
+write_marketplace frc "${general_entries[@]}" "${frc_entries[@]}"
+write_marketplace ftc "${general_entries[@]}" "${ftc_entries[@]}"

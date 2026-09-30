@@ -1,0 +1,8 @@
+{
+  "name": "frc-code-review",
+  "description": "Reviews an FRC robot-code Pull Request diff across the axes the diff actually calls for — Java/clean code, FRC/WPILib hardware-safety standards (command-based patterns, current limits, the 20 ms loop, CAN IDs, swerve/path deploy config), clean architecture, and infra/scripts. Produces a severity-tagged Markdown report ready to post as a PR comment. Use when asked to \"review this PR\", \"code review\", \"review the diff\", or when a CI agent needs to comment on a Pull Request in an FRC robot codebase.",
+  "version": "0.1.0",
+  "author": {
+    "name": "FIRST Robotics Skills contributors"
+  }
+}

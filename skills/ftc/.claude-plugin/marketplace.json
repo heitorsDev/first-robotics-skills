@@ -1,0 +1,13 @@
+{
+  "name": "first-robotics-skills-ftc",
+  "owner": {
+    "name": "heitorsDev"
+  },
+  "plugins": [
+    {
+      "name": "ftc-code-authoring",
+      "source": "../../ftc/ftc-code-authoring",
+      "description": "Write and debug FTC SDK code — OpMode lifecycle (init/loop/stop), hardware-map device access, LinearOpMode vs. iterative OpMode, TeleOp and Autonomous structure, and the hardware-map pitfalls that cause the most FTC runtime crashes. Use when authoring a new OpMode, converting between OpMode styles, or debugging a \"Config mismatch\" / ClassCastException / NullPointerException thrown by the Robot Controller app."
+    }
+  ]
+}
