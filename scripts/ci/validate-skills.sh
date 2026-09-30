@@ -25,6 +25,7 @@ for scope in general frc ftc; do
     [ -d "$dir" ] || continue
     name="$(basename "$dir")"
     [ "$name" = "_template" ] && continue
+    [[ "$name" == .* ]] && continue
 
     skill_md="$dir/SKILL.md"
     if [ ! -f "$skill_md" ]; then

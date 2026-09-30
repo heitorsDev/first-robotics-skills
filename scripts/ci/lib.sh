@@ -26,6 +26,7 @@ each_skill_dir() {
       [ -d "$dir" ] || continue
       name="$(basename "$dir")"
       [ "$name" = "_template" ] && continue
+      [[ "$name" == .* ]] && continue
       "$callback" "$scope" "${dir%/}"
     done
   done
