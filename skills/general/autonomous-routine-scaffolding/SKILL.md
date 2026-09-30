@@ -45,7 +45,7 @@ implementation yourself.
 Don't assume a pattern. Search for how this repo already structures autonomous code:
 
 ```bash
-grep -ril "autonomous\|auto\|opmode\|command\|sequentialcommandgroup\|statemachine" \
+grep -rilE "autonomous|opmode|command|sequentialcommandgroup|statemachine" \
   --include="*.java" --include="*.py" --include="*.kt" --include="*.cpp" --include="*.h" .
 ```
 
