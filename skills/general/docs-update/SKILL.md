@@ -23,7 +23,9 @@ hardcoded — it is discovered on the first run and persisted in `docs/.docsync/
 
 ## Rules that outrank everything else
 
-1. **Never push.** Commit on the docs branch and print the push command. The human pushes.
+1. **Never push.** Commit on the docs branch and print the push command. The human pushes. (This
+   assumes a human is there to run it — see "Running unattended" below for what changes, and what
+   doesn't, when nobody is.)
 2. **Never touch the source branch.** No commits, no merges into it, no edits to files outside
    `docs/` while on the docs branch. Merging documentation *back* into the source branch, when a
    repository wants that, happens through a reviewed Pull Request opened by CI — never by you.
@@ -37,6 +39,28 @@ hardcoded — it is discovered on the first run and persisted in `docs/.docsync/
    Do not guess your way through.
 
 ---
+
+## Running unattended
+
+A team can wire this skill into an autonomous agent in their own CI — the same way OffSeason_2026
+runs it from a GitHub Action after every merge to the default branch, instead of a human typing
+`/docs-update`. "Never push" (Rule 1) was written for a human at a keyboard; it does not become
+optional just because nobody's there to run the printed command.
+
+- **The default stays "never push," even unattended.** If the calling system prompt says nothing
+  about it, stop after committing on the docs branch and report what you would push and why —
+  don't push because nobody's around to tell you not to.
+- **A CI harness may grant a different behavior explicitly.** A common pattern: the human-facing
+  skill run stops at "committed, here's the push command" as always, while a *separate* CI step —
+  outside this skill, written by the team wiring it up — takes that commit, pushes it to a
+  `docs-sync/<sha>`-style branch, and opens the PR back to the source branch itself. If your
+  calling system prompt tells you to push and open that PR yourself instead, that's an explicit
+  override for that environment, not a default to assume.
+- **Stop-and-ask (Rule 6) becomes decide-and-record.** A merge conflict, a dirty working tree, or a
+  diff you can't make sense of still isn't something to guess your way through silently — but
+  there's nobody to answer a question. Make the most conservative call available (usually: stop,
+  commit nothing, explain why in your final output) and say so plainly, so a human reviews it after
+  the fact instead of you blocking mid-run waiting for an answer that won't come.
 
 ## Step 0 — Preconditions
 
