@@ -14,7 +14,7 @@ subsystem logic, tuning, or pathing math.
 This is not the tool that writes the actual drive/score/intake implementations, tunes trajectories,
 or authors new subsystem code from scratch — that's the platform-specific "code authoring &
 debugging" skill's job (FRC/FTC). If a step needs logic that doesn't exist yet, scaffold a
-clearly-named stub for it and say so in the report (Step 4), rather than inventing the
+clearly-named stub for it and say so in the report (Step 5), rather than inventing the
 implementation yourself.
 
 ---
@@ -23,7 +23,7 @@ implementation yourself.
 
 1. **Never invent robot behavior.** A step in the scaffold must trace directly to a clause in the
    routine description the user gave you. If a step is ambiguous or missing detail, scaffold the
-   closest reasonable stub and flag it (Step 4) — don't guess at timing, distances, or mechanism
+   closest reasonable stub and flag it (Step 5) — don't guess at timing, distances, or mechanism
    behavior.
 2. **Library/framework-agnostic, always.** Don't assume command-based, op-mode-based, or any
    specific state-machine library — discover what this repo's autonomous code already uses
@@ -57,7 +57,7 @@ Identify which of these (or another) the repo already uses:
 - **Custom state machine** (a hand-rolled enum/switch or step-list driver).
 
 **If no existing autonomous code exists at all**, this repo has nothing to scaffold from. Say so
-plainly in your report (Step 4) and propose the simplest pattern consistent with whatever
+plainly in your report (Step 5) and propose the simplest pattern consistent with whatever
 programming model the rest of the codebase already uses (command-based if WPILib command classes
 exist elsewhere, op-mode-based if only op modes exist, etc.) rather than defaulting to one pattern
 unconditionally.
@@ -97,7 +97,19 @@ scaffold, it doesn't refactor existing autonomous code.
 
 ---
 
-## Step 4 — Report
+## Step 4 — Commit
+
+Stage and commit the scaffold from Step 3 before reporting — a push command for uncommitted
+work is useless:
+
+```bash
+git add -- <files added/edited in Step 3>
+git commit -m "feat(<routine-name>): scaffold autonomous routine"
+```
+
+---
+
+## Step 5 — Report
 
 Short, structured:
 
@@ -120,7 +132,7 @@ A team can wire this skill into an autonomous agent the same way `docs-update` a
   — don't push just because nobody's there to say not to. A calling system prompt may grant a
   different behavior explicitly for that environment; that's an override, not something to assume.
 - **Ambiguity becomes decide-and-record, not stall-and-wait.** A routine detail you can't
-  confidently resolve — scaffold the most reasonable stub, flag it in the report (Step 4), and
+  confidently resolve — scaffold the most reasonable stub, flag it in the report (Step 5), and
   move on instead of blocking the run.
 
 ---
