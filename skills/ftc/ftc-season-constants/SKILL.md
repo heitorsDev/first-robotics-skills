@@ -149,12 +149,27 @@ Pass over the finished artifact: every constant has a comment citing the
 manual section/table/page it came from (AprilTag constants → the AprilTag
 table specifically, per Rule 2). Any gap found in either direction — a
 manual value with no constant, or a constant you can't trace to the manual —
-gets flagged in the report (Step 9), never silently dropped or silently
+gets flagged in the report (Step 10), never silently dropped or silently
 guessed.
 
 ---
 
-## Step 9 — Report
+## Step 9 — Commit
+
+If Step 7 wrote or replaced the artifact, stage and commit it before
+reporting — a push command for uncommitted work is useless:
+
+```bash
+git add -- <constants file(s) from Step 7>
+git commit -m "feat(<constants-file-name>): build FTC season constants from <manual/season identifier>"
+```
+
+If nothing was written (no manual was given, or Step 2 couldn't place the
+artifact), skip this step.
+
+---
+
+## Step 10 — Report
 
 Short, structured, with the four categories reported **separately** (never
 merged):
