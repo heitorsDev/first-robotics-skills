@@ -122,7 +122,22 @@ job on the next PR, not this skill's.
 
 ---
 
-## Step 6 — Report
+## Step 6 — Commit
+
+If Step 4 changed anything, stage and commit it before reporting — a push command for
+uncommitted work is useless:
+
+```bash
+git add -- <files touched in Step 4>
+git commit -m "fix(<constants-file-name>): sync constants to <manual/season identifier>"
+```
+
+If nothing was edited (every value already matched, or Step 2 found no constants file), skip
+this step — there's nothing to commit.
+
+---
+
+## Step 7 — Report
 
 Short, structured:
 
