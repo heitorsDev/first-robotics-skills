@@ -267,17 +267,30 @@ suite.">
 
 ---
 
-## Using this in CI
+## Running unattended
 
-When running inside an automated pipeline, the final report **is** the PR comment. So:
+A team can wire this skill into an autonomous agent that runs on every PR in their own CI — this
+skill's job stops at producing the report; it is not this skill's job to decide how that report
+reaches anyone. Keep those two concerns separate:
 
-- The last message should be the report only — no "okay, done," no narrating the steps taken.
-- Stay under the host platform's comment size limit (e.g. GitHub's ~65,000 characters). The
-  12-finding cap usually keeps this in check on its own.
-- Don't use shell access to commit, push, or approve the PR. This skill **only reviews and
-  comments**.
+- **Your final message is the report, and only the report.** No "okay, done," no narrating the
+  steps taken. Whatever wraps this skill will capture that final message as-is and deliver it
+  somewhere — an issue-style PR comment, a formal GitHub PR review (`gh pr review`, distinct from a
+  plain comment — one submits an actual review with an APPROVE/COMMENT/REQUEST_CHANGES verdict, the
+  other just appends to the conversation), a Slack message, anything. Which one is the calling
+  system prompt's decision, not this skill's — don't assume a specific delivery mechanism, and
+  don't hardcode one platform's posting command into your own steps.
+- If the delivery mechanism is a formal PR review and the calling system prompt asks you to map
+  this report's verdict onto it, the natural mapping is: ✅ Approved → approve, ⚠️ Approved with
+  caveats → comment, ❌ Needs changes before merge → request changes. That mapping is a default to
+  offer when asked, not something to act on unprompted — submitting the review is the wrapping
+  system's call to make, this skill produces the content it would contain.
+- Stay under whatever size limit the delivery mechanism imposes (e.g. GitHub's ~65,000 characters
+  for a single comment or review body). The 12-finding cap usually keeps this in check on its own.
+- Don't use shell access to commit, push, approve, or comment yourself. This skill **only
+  reviews** — producing the report is the whole job, however it's decided to get delivered.
 - If you lack permission to read the diff, say which command failed and what access the
-  repository needs to grant.
+  repository needs to grant, rather than stalling.
 - On a new push to an already-reviewed PR, Step 1.5's history is what prevents writing the same
   review twice. Read it first, always.
 - The workflow needs `pull-requests: read` (already covered by `pull-requests: write`) and
