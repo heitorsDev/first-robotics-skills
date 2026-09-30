@@ -1,5 +1,7 @@
 # Contributing
 
+> Leia em português: [`CONTRIBUTING-pt-br.md`](./CONTRIBUTING-pt-br.md)
+
 ## Layout
 
 ```
@@ -34,6 +36,23 @@ To scaffold by hand instead:
 
 Scaffolds `skills/<scope>/<skill-name>/` from `skills/_template/`. FRC/FTC names must be
 prefixed (`frc-...` / `ftc-...`); general names are bare.
+
+## Implementing an existing issue
+
+Browse the [`new skill`](../../issues?q=is%3Aissue+is%3Aopen+label%3A%22new+skill%22) label for
+skills that already have a settled scope/name/spec and just need implementing — the initial batch
+came straight from `SPEC.md`. Pick one nobody else is working on.
+
+If you're using Claude Code inside this repo, point the `create-skill` skill
+(`.claude/skills/create-skill/`) at the issue number and it drives the whole thing: branch
+(`feat/<name>`), scaffold (`scripts/new-skill.sh`), writing `SKILL.md` from the issue's
+`description`/`spec` fields, local validation, commit, push, and opening the PR with
+`Closes #<n>`. It stops there — it never merges its own PR.
+
+Working by hand instead, do the same steps yourself: branch off `feat/<name>`, run
+`./scripts/new-skill.sh <scope> <name>`, write `SKILL.md`, run
+`bash scripts/ci/validate-skills.sh` before committing, and reference `Closes #<n>` in the PR body
+so the issue closes on merge.
 
 ## One skill, one PR
 
