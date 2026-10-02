@@ -50,6 +50,17 @@ REV (REVLib — `SparkMax`, `SparkFlex`, `SparkMaxConfig`), Studica (NavX), or a
 vendor library. Record the exact library **and major version**, since config APIs differ between
 versions (e.g. Phoenix 5 vs. Phoenix 6, REVLib's pre- and post-config-object APIs).
 
+**FTC vendor sensors work differently.** Limelight3A, goBILDA Pinpoint, SparkFun OTOS, and
+OctoQuad ship as classes built into the FTC SDK itself, not as a separate vendordep — there's no
+JSON manifest to grep. Detect by class usage and SDK version floor instead:
+
+```bash
+grep -rl "Limelight3A\|GoBildaPinpointDriver\|SparkFunOTOS\|OctoQuad\|AnalogInput" \
+  --include=*.java . 2>/dev/null
+```
+
+See `references/ftc-vendors.md` for each one's minimum SDK version, API surface, and pitfalls.
+
 **If nothing recognized is found**, say so in the report and ask which vendor/library to target
 rather than guessing.
 
@@ -92,6 +103,8 @@ known pitfall classes, citing `file:line` and the exact issue for each:
 - A feedback sensor a control mode requires but that isn't configured.
 - A motor-safety/watchdog default left at the library's factory default when the rest of the
   repo's devices explicitly set it.
+- FTC built-in vendor sensors (Limelight3A, Pinpoint, OTOS, OctoQuad) and `LynxModule` bulk
+  caching — see `references/ftc-vendors.md` for the pitfall list.
 
 Gate every flag with the concrete-scenario test: can you name the exact missing/wrong config and
 where it is? If not, it's not a finding.
