@@ -1,14 +1,15 @@
 ---
 name: telemetry-dashboard-wiring
-description: Detects the dashboard/telemetry tooling already wired into a repo (Shuffleboard, SmartDashboard, AdvantageKit/AdvantageScope, FTC Dashboard, etc.) and adds or standardizes bindings for live-tunable values (PID gains, setpoints) and debug output using that tooling's own conventions. Use when asked to "wire up telemetry", "add a dashboard binding", "expose this PID gain to the dashboard", "log this to AdvantageScope", or to standardize scattered/inconsistent telemetry calls.
+description: Detects the dashboard/telemetry tooling already wired into a repo (Shuffleboard, SmartDashboard, AdvantageKit/AdvantageScope, FTC Dashboard, FTC Panels, etc.) and adds or standardizes bindings for live-tunable values (PID gains, setpoints) and debug output using that tooling's own conventions. Use when asked to "wire up telemetry", "add a dashboard binding", "expose this PID gain to the dashboard", "log this to AdvantageScope", or to standardize scattered/inconsistent telemetry calls.
 license: MIT
 ---
 
 # Telemetry Dashboard Wiring
 
 You detect which **dashboard/telemetry tooling** a repo already uses — Shuffleboard,
-SmartDashboard, AdvantageKit/AdvantageScope, FTC Dashboard, or raw NetworkTables — and add or
-standardize **bindings** for live-tunable values (PID gains, setpoints, feedforward constants)
+SmartDashboard, AdvantageKit/AdvantageScope, FTC Dashboard, FTC Panels (`com.bylazar`), or raw
+NetworkTables — and add or standardize **bindings** for live-tunable values (PID gains, setpoints,
+feedforward constants)
 and debug output, following that tooling's own conventions rather than introducing a new one.
 
 This is not a vendor/hardware integration skill. It doesn't construct or configure the motor
@@ -62,14 +63,22 @@ grep -rl "org.littletonrobotics.junction\|Logger\.recordOutput\|Logger\.processI
 grep -rl "com.acmerobotics.dashboard\|FtcDashboard.getInstance\|@Config" \
   --include='*.java' .
 
+# FTC Panels (bylazar)
+grep -rl "com\.bylazar\.configurables\.annotations\.Configurable\|com\.bylazar\.telemetry\.PanelsTelemetry\|@Configurable" \
+  --include='*.java' .
+
 # Raw NetworkTables (no wrapper library)
 grep -rl "NetworkTableInstance" --include='*.java' .
 ```
 
 Match what's found to a tool and record the **exact existing convention**: Shuffleboard tab
 names and widget layout, SmartDashboard key prefixes, AdvantageKit's `recordOutput` key
-hierarchy, or FTC Dashboard's `@Config` class/field grouping. This convention is what every new
+hierarchy, FTC Dashboard's `@Config` class/field grouping, or FTC Panels' `@Configurable`
+class/field grouping and `PanelsTelemetry` key hierarchy. This convention is what every new
 binding must match.
+
+FTC Dashboard and FTC Panels both bind the same port and crash-loop (`BindException`) if both are
+present in one build — if both are detected, flag it instead of picking one for the repo.
 
 **If nothing recognized is found**, say so in the report and default to the ecosystem norm for
 the repo type (WPILib repo → SmartDashboard; FTC repo → FTC Dashboard) rather than stalling —
@@ -104,8 +113,9 @@ Using the detected tool's real, convention-matching API:
 
 - For each unbound live-tunable value, add a binding that both reads the current value and lets
   it be set at runtime, using the tool's own idiom for that (e.g. FTC Dashboard's `@Config`
-  static field, a Shuffleboard `addPersistent` entry with a change listener, an AdvantageKit
-  `LoggedTunableNumber`).
+  static field, FTC Panels' `@Configurable`-annotated class with a `static` tunable field (or
+  nested config object) read live from the hot loop, a Shuffleboard `addPersistent` entry with a
+  change listener, an AdvantageKit `LoggedTunableNumber`).
 - For each unbound debug value, add a binding for observation only, matching the tool's existing
   output convention (e.g. `Logger.recordOutput("Subsystem/Value", value)` matching the repo's
   existing key hierarchy).
@@ -124,6 +134,11 @@ Note, but don't fix, anything outside binding/logging work:
 
 - Control logic that looks wrong while wiring around it (e.g. a PID gain that's clearly unused
   by the controller it's bound from).
+- A dashboard-bound tunable (`@Config` static field, `@Configurable` static field, etc.) that
+  gets read into a local or instance variable once — in a constructor, `init()`, or at match
+  start — instead of being re-read from the live field every loop iteration. After that copy,
+  dashboard/Panels edits are silently ignored even though the binding itself looks correct. Flag
+  both `file:line`s: the live field's declaration and the point where it's copied once.
 - A value whose live-tunable vs. debug-only classification couldn't be confidently made.
 - A repo with no detectable dashboard tooling at all, where a human should confirm the assumed
   default from Step 1 before it's relied on.
