@@ -48,13 +48,18 @@ Don't assume one. Search for what's actually present:
 grep -rl "SimHooks\|DCMotorSim\|FlywheelSim\|ElevatorSim\|SingleJointedArmSim\|edu.wpi.first.wpilibj.simulation" \
   --include=*.java --include=*.kt . 2>/dev/null
 
-# Existing test source dir + build wiring
+# Existing test source dir + build wiring (recurse — FTC's real wiring lives in a
+# module subdir like TeamCode/build.gradle, not just the root file)
 find . -type d -iname test -path "*src*"
-grep -l "junit\|testImplementation\|useJUnitPlatform" build.gradle build.gradle.kts 2>/dev/null
+find . -name "build.gradle" -o -name "build.gradle.kts" | xargs grep -l "junit\|testImplementation\|useJUnitPlatform" 2>/dev/null
 
 # Python
 find . -iname "pytest.ini" -o -iname "conftest.py"
 grep -l "pytest" requirements*.txt pyproject.toml setup.cfg 2>/dev/null
+
+# FTC project fingerprint — is this an Android/Gradle FTC repo at all (vs WPILib)?
+grep -rl "com.qualcomm.robotcore\|org.firstinspires.ftc\|com.android.application" \
+  --include=build.gradle --include=build.gradle.kts . 2>/dev/null
 
 # FTC — check for sim hooks or a mock/abstraction seam; don't assume one exists
 grep -rl "SimulatedOpMode\|Mockito\|HardwareMap.*mock" --include=*.java . 2>/dev/null
@@ -90,6 +95,29 @@ convention — never a custom test runner:
 - **Java/WPILib:** `src/test/java`, JUnit 5, wired into the existing Gradle `test` task.
 - **Python:** `tests/` + pytest, following whatever the repo's `pyproject.toml`/
   `requirements.txt` already implies.
+- **FTC (Android Gradle, e.g. a `TeamCode` module):** `src/test/java`, JUnit 5, wired via
+  `testOptions.unitTests.all { useJUnitPlatform() }` in the module's own `build.gradle` —
+  never the shared `build.common.gradle`/`build.dependencies.gradle` files the FTC SDK
+  itself calls "extraordinarily rare to edit":
+
+  ```groovy
+  android {
+      testOptions {
+          unitTests.all {
+              useJUnitPlatform()
+          }
+      }
+  }
+
+  dependencies {
+      testImplementation 'org.junit.jupiter:junit-jupiter:<latest 5.x — match repo/CI pin if one exists>'
+      testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+  }
+  ```
+
+  This runs on stock Android Gradle Plugin with no third-party JUnit5 plugin, as long as
+  tests stay plain-JVM (mock/abstraction seam, not Robolectric or real Android framework
+  calls — exactly what this skill already does for FTC below).
 
 If the subsystem under test talks to hardware directly with no sim-mode path to exercise
 it, add the minimal seam needed:
