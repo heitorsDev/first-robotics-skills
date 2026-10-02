@@ -1,6 +1,6 @@
 ---
 name: pathing-trajectory-codegen
-description: Writes or tunes path-following/trajectory-generation code and its deploy-time config/field files, against whatever pathing library a repo already has — PathPlanner, Choreo, RoadRunner, or a custom format — detected or asked for, never assumed. Use when asked to "generate a path", "write a trajectory", "tune this PathPlanner/Choreo/RoadRunner path", or to add a new autonomous path to a robot codebase.
+description: Writes or tunes path-following/trajectory-generation code and its deploy-time config/field files, against whatever pathing library a repo already has — PathPlanner, Choreo, RoadRunner, Pedro Pathing, or a custom format — detected or asked for, never assumed. Use when asked to "generate a path", "write a trajectory", "tune this PathPlanner/Choreo/RoadRunner/Pedro path", or to add a new autonomous path to a robot codebase.
 license: MIT
 ---
 
@@ -19,8 +19,8 @@ library in use, ask which one before writing anything.
 ## Rules that outrank everything else
 
 1. **Never assume a library.** Detect it (Step 1) or ask. Don't default to PathPlanner, Choreo,
-   or RoadRunner because it's common — silently guessing wrong produces a file the repo's
-   tooling can't even load.
+   RoadRunner, or Pedro Pathing because it's common — silently guessing wrong produces a file the
+   repo's tooling can't even load.
 2. **Match the library's own schema exactly.** Coordinate units, JSON/config structure, file
    location, naming — follow what the detected library (and this repo's existing paths, if any)
    already does. Don't invent a format variant.
@@ -40,7 +40,7 @@ library in use, ask which one before writing anything.
 Don't assume one. Check dependency manifests and deploy-file conventions:
 
 ```bash
-grep -ril "pathplanner\|choreo\|roadrunner" \
+grep -ril "pathplanner\|choreo\|roadrunner\|pedropathing" \
   build.gradle build.gradle.kts pom.xml requirements.txt pyproject.toml vendordeps 2>/dev/null
 find . -type d \( -iname "pathplanner" -o -iname "choreo" \) 2>/dev/null
 find . -iname "*.path" -o -iname "*.traj" -o -iname "*.chor" 2>/dev/null
@@ -51,9 +51,17 @@ Match what's found to a library:
 - **PathPlanner** — `deploy/pathplanner/*.path` JSON files, `PathPlannerLib` vendordep/gradle
   dependency, `AutoBuilder`/`PathPlannerAuto` references in code.
 - **Choreo** — `deploy/choreo/*.traj` (or `.chor`) JSON files, `choreolib` dependency.
-- **RoadRunner** — no deploy-time file; trajectories built via `TrajectorySequenceBuilder` (or
-  the newer Actions API) calls directly in Java/Kotlin, `RoadRunner`/`roadrunner` gradle
-  dependency, a `RoadRunnerConfig`/`DriveConstants`-style tuning file.
+- **RoadRunner** — no deploy-time file; trajectories built in Java/Kotlin via the current 1.0
+  Actions API (`TrajectoryActionBuilder`, `Action`, `SequentialAction`) or, in older code, the
+  pre-1.0 `TrajectorySequenceBuilder` — check which generation existing calls use, don't assume.
+  `com.acmerobotics.roadrunner`/`roadrunner` gradle dependency, a `RoadRunnerConfig`/
+  `DriveConstants`-style tuning file.
+- **Pedro Pathing** — FTC-only; no deploy-time file, trajectories built in Java/Kotlin via
+  `Follower`/`PathBuilder` calls. Gradle dependency `com.pedropathing:core`/`com.pedropathing:ftc`
+  (3.x split into `core`+`revhub`+`tuning`; 2.x was the single `ftc` artifact) or
+  `org.solverslib:pedroPathing`. Check the dependency version before writing — 3.x renamed
+  `PathChain` to `Path` and changed several `Follower` method names; see
+  `references/pedro-pathing.md` for the full rename table before touching Pedro code.
 - **Custom** — a hand-rolled waypoint/trajectory format that matches none of the above.
 
 **If nothing is found or detection is ambiguous**, ask the user which library to target before
@@ -80,9 +88,14 @@ In the detected library's exact schema:
 
 - **PathPlanner / Choreo**: write or edit the `.path`/`.traj` JSON in `deploy/<library>/`,
   matching field/units/version conventions of any existing files in that folder.
-- **RoadRunner**: write or edit the builder-call code that constructs the trajectory sequence,
-  matching the repo's existing builder-call style and units (inches vs. meters — check existing
-  calls, don't assume).
+- **RoadRunner**: write or edit the builder-call code — `TrajectoryActionBuilder`/`Action` chains
+  on 1.0, `TrajectorySequenceBuilder` on pre-1.0 — matching whichever generation the repo already
+  uses and its units (inches vs. meters — check existing calls, don't assume).
+- **Pedro Pathing**: write or edit the `Follower`/`PathBuilder` call code, matching whichever
+  generation the gradle dependency pins — 3.x's `Path`/`Paths.path(...)` or 2.x's `PathChain` —
+  per `references/pedro-pathing.md`. Never write 2.x names against a 3.x dependency or vice versa.
+  If the repo is still on Pedro 2.x, say so in the report (Step 5); that's a fact to flag, not a
+  migration to perform uninvited.
 - **Custom**: match the existing custom format's structure precisely; if this is the repo's
   first path and no format exists, say so in the report (Step 5) instead of inventing one.
 
@@ -113,7 +126,8 @@ this step.
 
 Short, structured:
 
-- **Library detected:** PathPlanner / Choreo / RoadRunner / custom / none found.
+- **Library detected:** PathPlanner / Choreo / RoadRunner / Pedro Pathing (+ generation: 2.x/3.x)
+  / custom / none found.
 - **Written/tuned:** file path (or `file:line` for code-based trajectories) — path/trajectory
   name.
 - **Constraints used:** each constraint, tagged user-stated or library default.
