@@ -292,3 +292,5 @@ Keep those two concerns separate:
   from writing the same review twice. Read it first, always.
 - The workflow needs `pull-requests: read` (already covered by `pull-requests: write`) and
   `$GH_TOKEN` in the environment for `get-pr-history.sh` to work.
+- See `examples/ci/README.md` (repo root) for a concrete, copy-pasteable GitHub Actions workflow
+  that posts this skill's report as an actual PR review (`gh pr review`), not a plain comment.
